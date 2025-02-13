@@ -41,53 +41,67 @@ class SpeakBot:
             segments.append((current_segment.strip(), current_lang))
 
         return segments
+    
+    def split_by_language2(self, text):
+        words = text.split()
+        segments = []
+        current_lang = "en"
+        current_segment = ""
+
+        for word in words:
+            lang, _ = langid.classify(word)  # Detect language per word
+            if lang != "zh":
+                lang = "en"
+            if lang != current_lang:
+                if current_segment:
+                    segments.append((current_segment.strip(), current_lang))
+                current_segment = word
+                current_lang = lang
+            else:
+                current_segment += " " + word
+
+        if current_segment:
+            segments.append((current_segment.strip(), current_lang))
+        # segments.append((text, current_lang))
+
+        return segments
+
 
     def generate_speech(self, text):
-        # Get text segments with detected languages
-        text_segments = self.split_by_language(text)
-
-        # Initialize array to store audio
-        audio_clips = []
-        sample_rate = None
-
-        # Process each segment separately
-        for segment_text, lang in text_segments:
-            print(f"Processing '{segment_text}' as language '{lang}'")
-
-            # Convert langdetect's output to TTS-compatible language names
-            language_name = "en" if lang == "en" else "zh"
-            speaker_wav = '/home/set/Projects/python-projects/chat-bot/set_voice.wav'
-            # Generate speech for this segment
-            try:
-                audio_data = self.tts.tts(
-                    text=segment_text,
-                    speaker_wav=speaker_wav,
-                    language=language_name
-                )
-            except Exception as e:
-                print(f"Error generating speech for segment '{segment_text}': {e}")
-                continue
-
-            # Store audio data
-            audio_clips.append(audio_data)
         
-        # Check if audio_clips is empty
-        if len(audio_clips) == 0:
-            raise ValueError("No audio data generated for the text segments.")
-
-        # Concatenate all audio segments
-        final_audio = np.concatenate(audio_clips)
-
-        return final_audio, self.tts.synthesizer.output_sample_rate
-    
-    def text_direct_to_speech(self, text, language="en"):
-        speaker_wav = '/home/set/Projects/python-projects/chat-bot/set_voice.wav'
-        audio_data = self.tts.tts(
-            text=text,
-            speaker_wav=speaker_wav,
-            language=language
+        # if text replace 。 to ,
+        # text = text.replace("。", ",").replace(".", ",").replace("!", ",").replace("?", ",").replace("\n", ",")
+        lang = self.detect_languages(text)
+        speaker_wav = 'output.wav'
+        try:
+            print(f"Processing '{text}' as language '{lang}'")
+            audio_data = self.tts.tts(
+                text=text,
+                speaker_wav=speaker_wav,
+                language=lang
             )
+        except Exception as e:
+            print(f"Error generating speech for segment '{text}': {e}")
+            return ValueError("No audio data generated for the text segments.")
         return audio_data, self.tts.synthesizer.output_sample_rate
+
+
+    # def text_direct_to_speech(self, text, language="en"):
+    #     speaker_wav = 'set_voice.wav'
+    #     audio_data = self.tts.tts(
+    #         text=text,
+    #         speaker_wav=speaker_wav,
+    #         language=language
+    #         )
+    #     return audio_data, self.tts.synthesizer.output_sample_rate
+
+    def detect_languages(self, text):
+        langid.set_languages(['en', 'zh'])
+        words = text.split()
+        for word in words:
+            if langid.classify(word)[0] == 'zh':
+                return 'zh'
+        return 'en'
 
     def play_speech(self, audio_data, sample_rate):
         # Play the generated speech
@@ -101,7 +115,7 @@ class SpeakBot:
 # Example usage
 if __name__ == "__main__":
     speak_bot = SpeakBot()
-    text = "Hello, welcome to the world of AI."
+    text = "Hello 蘇冠宇 welcome to the world of AI"
     try:
         audio_data, sample_rate = speak_bot.generate_speech(text)
         speak_bot.play_speech(audio_data, sample_rate)

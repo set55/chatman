@@ -7,15 +7,36 @@ if __name__ == "__main__":
     speak = SpeakBot()
     listen = ListenBot()
     mind = Thinker()
-    with sr.Microphone() as source:
-        # Adjust for ambient noise and record the audio
-        listen.recognizer.adjust_for_ambient_noise(source)
-        while True:
+    # with sr.Microphone() as source:
+    #     # Adjust for ambient noise and record the audio
+    #     listen.recognizer.adjust_for_ambient_noise(source)
+    #     while True:
+    #         text = listen.listen(source)
+    #         if text:
+    #             print(f"Text detected: {text}")
+    #             res = mind.think(text)
+    #             if res == "":
+    #                 continue
+    #             try:
+    #                 audio_data, sample_rate = speak.generate_speech(res)
+    #                 speak.play_speech(audio_data, sample_rate)
+    #             except ValueError:
+    #                 print("Error in generating speech")
+    #                 continue
+    while True:
+        with sr.Microphone() as source:
+            # Adjust for ambient noise and record the audio
+            listen.recognizer.adjust_for_ambient_noise(source)
+            print("Listening...")
             text = listen.listen(source)
             if text:
                 print(f"Text detected: {text}")
                 res = mind.think(text)
                 if res == "":
                     continue
-                audio_data, sample_rate = speak.generate_speech(res)
-                speak.play_speech(audio_data, sample_rate)
+                try:
+                    audio_data, sample_rate = speak.generate_speech(res)
+                    speak.play_speech(audio_data, sample_rate)
+                except ValueError:
+                    print("Error in generating speech")
+                    continue

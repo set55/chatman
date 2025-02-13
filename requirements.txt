@@ -2,3 +2,9 @@ langdetect
 TTS
 sounddevice
 numpy
+torch
+SpeechRecognition
+PyQt5
+openai-whisper
+ollama
+langid
