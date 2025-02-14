@@ -21,6 +21,8 @@ mchatman
 ```
 
 ## Installation
+This project requires Python 3.12. Ensure you have Python 3.12 installed on your system before proceeding.
+
 To set up the project, clone the repository and navigate to the project directory. Then, install the required dependencies using pip:
 
 ```
