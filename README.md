@@ -1,11 +1,13 @@
 # AI Chat Bot
 
 ## Overview
-his is a simple AI chat bot project that uses language detection and text-to-speech (TTS) to generate speech from mixed-language text.
+This is a simple AI chat bot project that uses language detection and text-to-speech (TTS) to generate speech from mixed-language text.
 
 ## Project Structure
 ```
-mchatman
+chatman
+├── config
+│   ├── system.json.example
 ├── src
 │   ├── main.py
 |   ├── qt-input.py
@@ -16,6 +18,7 @@ mchatman
 │       ├── qtui.py
 │       ├── speakbot.py
 │       └── thinker.py
+├── tmp
 ├── requirements.txt
 └── README.md
 ```
@@ -51,6 +54,32 @@ If you just want the chat bot to repeat what you talk about (without running the
 python src/repeat-speak.py
 ```
 
+## Configure chatbot character or other function
+To configure the project, copy the `system.json.example` file to `system.json` in the `config` directory. You can use the content from the example file as a starting point and modify it as needed:
+
+```
+cp config/system.json.example config/system.json
+```
+
+Feel free to add any additional configurations or settings to the `system.json` file to suit your needs.
+
+```
+{
+    "system_init": [
+        {
+            "role": "system",
+            "content": "You are a AI agent"
+        }
+      ]
+}
+```
+
+## Bot memory
+To enable the chat bot to remember previous interactions, the bot's memory will be saved to `tmp/history.json`. If you wish to reset the bot's memory, simply delete this file:
+
+```
+rm tmp/history.json
+```
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
