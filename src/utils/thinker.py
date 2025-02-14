@@ -30,8 +30,6 @@ class Thinker:
             stream=True
         )
 
-        # remove use ask content(must last message)
-        self.messages.pop(-1)
         response_text = ""
         for chunk in stream:
             # cleaned_content = ''.join(filter(lambda x: x.isalnum() or x.isspace(), chunk['message']['content']))
@@ -39,6 +37,9 @@ class Thinker:
 
             response_text += chunk['message']['content']
             # print(chunk['message']['content'], end='', flush=True)
+        
+        # record assistant message to self.messages for chat history
+        self.messages.append({'role': 'assistant', 'content': response_text})
         return response_text
     
     def detect_languages(self, text):
