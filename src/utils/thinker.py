@@ -3,11 +3,20 @@ import langid
 
 systemLanguage = 0
 class Thinker:
-    def __init__(self):
+    def __init__(self, history_messages=[], system_messages=[]):
         print("Thinker initialized")
+        #default system message
         self.messages = [
             {'role': 'system', 'content': 'only speak english, and not speak more then 100 tokens'}
             ]
+        
+        # load system message from config
+        self.system_messages = system_messages
+        self.messages += self.system_messages
+
+        self.history_message = history_messages
+        if self.history_message:
+            self.messages += self.history_message
         
 
     def think(self, text):
@@ -21,8 +30,9 @@ class Thinker:
         # set system language
         self.messages[systemLanguage] = systemMessage
 
-        # add user content
+        # add user content this time
         self.messages.append({'role': 'user', 'content': text})
+        self.history_message.append({'role': 'user', 'content': text})
         
         stream = chat(
             model='llama3.2',
@@ -40,6 +50,8 @@ class Thinker:
         
         # record assistant message to self.messages for chat history
         self.messages.append({'role': 'assistant', 'content': response_text})
+        self.history_message.append({'role': 'assistant', 'content': response_text})
+        
         return response_text
     
     def detect_languages(self, text):
@@ -55,6 +67,11 @@ class Thinker:
 # Example usage
 if __name__ == "__main__":
     thinker = Thinker()
-    text = "請自我介紹"
+    # show memory
+    print(thinker.messages)
+
+
+    # test think
+    text = "Introduce yourself"
     response = thinker.think(text)
     print(f"Response: {response}")

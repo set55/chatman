@@ -1,12 +1,16 @@
+import speech_recognition as sr
 from utils.speakbot import SpeakBot
 from utils.listenbot import ListenBot
 from utils.thinker import Thinker
-import speech_recognition as sr
+from utils.storage import Storage
+
 
 if __name__ == "__main__":
+    storage = Storage()
     speak = SpeakBot()
     listen = ListenBot()
-    mind = Thinker()
+    mind = Thinker(storage.get_history_message(), storage.get_system_message())
+    
     while True:
         with sr.Microphone() as source:
             # Adjust for ambient noise and record the audio
@@ -19,6 +23,8 @@ if __name__ == "__main__":
                 if res == "":
                     continue
                 try:
+                    # after thinking, save the history message
+                    storage.save_history_message(mind.history_message)
                     audio_data, sample_rate = speak.generate_speech(res)
                     speak.play_speech(audio_data, sample_rate)
                 except ValueError:
